@@ -21,6 +21,11 @@ def run_yolo(model, image_path):
     results = model.predict(image_path, save=False, imgsz=320, conf=0.5)
     return results
 
+
+# Fungsi untuk mengonversi citra BGR ke RGB
+def convert_bgr_to_rgb(image):
+    return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
 # Judul aplikasi
 st.title('Deteksi Jamur pada Roti dengan YOLOv8')
 
@@ -40,10 +45,28 @@ if uploaded_file is not None:
     detected_img_1 = results_1[0].plot()
     detected_img_2 = results_2[0].plot()
 
-    # Mengubah gambar hasil deteksi ke format yang bisa ditampilkan oleh Streamlit
-    detected_img_pil_1 = Image.fromarray(detected_img_1)
-    detected_img_pil_2 = Image.fromarray(detected_img_2)
+    # Mengonversi gambar dari BGR ke RGB
+    detected_img_1_rgb = convert_bgr_to_rgb(detected_img_1)
+    detected_img_2_rgb = convert_bgr_to_rgb(detected_img_2)
 
-    # Menampilkan hasil deteksi
-    st.image(detected_img_pil_1, caption='Hasil Deteksi dengan Model 1', use_column_width=True)
-    st.image(detected_img_pil_2, caption='Hasil Deteksi dengan Model 2', use_column_width=True)
+    # Mengubah gambar hasil deteksi ke format yang bisa ditampilkan oleh Streamlit
+    detected_img_pil_1 = Image.fromarray(detected_img_1_rgb)
+    detected_img_pil_2 = Image.fromarray(detected_img_2_rgb)
+
+    # Membaca gambar asli
+    original_img = Image.open("uploaded_image.jpg")
+
+    # Membuat dua kolom untuk menampilkan gambar asli dan gambar hasil deteksi secara berdampingan
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.header("Citra Asli")
+        st.image(original_img, use_column_width=True)
+
+    with col2:
+        st.header("Hasil Deteksi dengan Model 1")
+        st.image(detected_img_pil_1, use_column_width=True)
+
+    with col3:
+        st.header("Hasil Deteksi dengan Model 2")
+        st.image(detected_img_pil_2, use_column_width=True)
