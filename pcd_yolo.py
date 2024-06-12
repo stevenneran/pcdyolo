@@ -2,7 +2,6 @@ import subprocess
 import sys
 import streamlit as st
 from PIL import Image
-import numpy as np
 import base64
 
 # Fungsi untuk menginstal modul dari requirements.txt
