@@ -3,6 +3,7 @@ import sys
 import streamlit as st
 from PIL import Image
 import numpy as np
+import base64
 
 # Fungsi untuk menginstal modul dari requirements.txt
 def install_requirements():
@@ -11,7 +12,7 @@ def install_requirements():
 # Instalasi dari requirements.txt
 install_requirements()
 
-# Mengimpor modul setelah instalasi
+# Mengimpor library
 import cv2
 from ultralytics import YOLO
 
@@ -21,10 +22,29 @@ def run_yolo(model, image_path):
     results = model.predict(image_path, save=False, imgsz=320, conf=0.5)
     return results
 
-
 # Fungsi untuk mengonversi citra BGR ke RGB
 def convert_bgr_to_rgb(image):
     return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+# Fungsi untuk menyisipkan CSS ke dalam halaman Streamlit
+def add_background(image_file):
+    with open(image_file, "rb") as image:
+        encoded_string = base64.b64encode(image.read()).decode()
+    
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url(data:image/png;base64,{encoded_string});
+            background-size: cover;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Menambahkan background dari file background.png
+add_background("background2.png")
 
 # Judul aplikasi
 st.title('Deteksi Jamur pada Roti dengan YOLOv8')
@@ -58,15 +78,11 @@ if uploaded_file is not None:
 
     # Membuat dua kolom untuk menampilkan gambar asli dan gambar hasil deteksi secara berdampingan
     col1, col2, col3 = st.columns(3)
-
     with col1:
-        st.header("Citra Asli")
-        st.image(original_img, use_column_width=True)
+        st.image(original_img, caption='Citra Asli', use_column_width=True)
 
     with col2:
-        st.header("Hasil Deteksi dengan Model 1")
-        st.image(detected_img_pil_1, use_column_width=True)
+        st.image(detected_img_pil_1, caption='Hasil Deteksi dengan Model 1', use_column_width=True)
 
     with col3:
-        st.header("Hasil Deteksi dengan Model 2")
-        st.image(detected_img_pil_2, use_column_width=True)
+        st.image(detected_img_pil_2, caption='Hasil Deteksi dengan Model 2', use_column_width=True)
